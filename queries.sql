@@ -1,4 +1,4 @@
--- 1. What is the percentage of posts that have at least one answer?
+ -- 1. What is the percentage of posts that have at least one answer?
 SELECT (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM posts where posttypeid =1)) AS percentage
 FROM posts
 WHERE answercount >= 1;
@@ -12,7 +12,7 @@ LIMIT 10;
 -- 3. Which day of the week has most questions answered within an hour?
 
 select to_char(p2.creationdate,'day') as nameofday, count(*) from posts p1,posts p2
-where p1.posttypeid=2
+where p1.posttypeid=2 
 and p1.parentid=p2.id
 and extract(year from age(p1.creationdate,p2.creationdate))=0
 and extract(month from age(p1.creationdate,p2.creationdate))=0
