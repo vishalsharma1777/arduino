@@ -65,13 +65,46 @@ WHERE t.tagname IN (SELECT tagname FROM LeastUsedTags) and extract(year from p.c
 
 -- 8.When did arduino.stackexchange.com have the most usage? Has it declined in usage now? (somewhat open-ended question. Use your own interpretation of the question)
 
-select 
-extract(year from creationdate),
-count(*) as numberOfposts,
-cast(case when extract(year from creationdate)!=2023 then 'true' else 'false' end as text)as "decline usage"  from posts
-group by extract(year from creationdate)
-order by numberofposts desc
-limit 1;
+SELECT
+    p.years,
+    numberofposts,
+    numberofcomments,
+    numberofvotes,
+    (numberofposts + numberofcomments + numberofvotes) AS total
+FROM
+    (SELECT
+        EXTRACT(YEAR FROM arduino.posts.creationdate) AS years,
+        COUNT(*) AS numberOfPosts
+    FROM
+        arduino.posts
+    GROUP BY
+        years) AS p
+
+INNER JOIN
+    (SELECT
+        EXTRACT(YEAR FROM c.creationdate) AS years,
+        COUNT(*) AS numberOfComments
+    FROM
+        arduino.comments c
+    GROUP BY
+        years) AS c
+ON
+    c.years = p.years
+
+INNER JOIN
+    (SELECT
+        EXTRACT(YEAR FROM v.creationdate) AS years,
+        COUNT(*) AS numberOfVotes
+    FROM
+        arduino.votes v
+    GROUP BY
+        years) AS v
+ON
+    v.years = p.years
+
+ORDER BY
+    total DESC
+
 
 
 -- 9.Find the top 5 users who have performed the most number of actions in terms of creating posts, comments, votes. Calculate the score in the following way:
